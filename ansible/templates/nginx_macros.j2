@@ -1,0 +1,24 @@
+{% macro nginx_write_params(params, indent=0) %}
+{% if params is mapping %}
+{% set section, subparams = params.items()[0] %}
+{# For YAML links properly work #}
+{% if subparams is string %}
+{{ section | indent(width=indent, indentfirst=true) }} {{ subparams }};
+{% else %}
+{{ section | indent(width=indent, indentfirst=true) }} {
+{{ nginx_write_params(subparams, indent+2) -}}
+{{ "}" | indent(width=indent, indentfirst=true) }}
+{% endif %}
+{% elif params is not string %}
+{% for param in params %}
+{% if param is string %}
+{{ param | indent(width=indent, indentfirst=true) }};
+{% elif param is mapping %}
+
+{{ nginx_write_params(param, indent) -}}
+{% endif %}
+{% endfor %}
+{% elif params is string %}
+{{ params }}
+{% endif %}
+{% endmacro %}

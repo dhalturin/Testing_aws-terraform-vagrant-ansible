@@ -1,0 +1,57 @@
+---
+nginx_conf_template: "{{ playbook_dir }}/templates/nginxx.conf.j2"
+nginx_remove_default_vhost: true
+nginx_multi_accept: "on"
+nginx_server_tokens: "off"
+nginx_client_max_body_size: "10m"
+nginx_extra_http_options: |
+  include /etc/nginx/conf.d/config/*.conf;
+  autoindex_exact_size off;
+  autoindex_localtime on;
+  ssi on;
+
+nginx_log_format: |
+  '[$time_local] $http_host $remote_addr $remote_user '
+  '"$request" "$request_filename" code: $status bytes: $body_bytes_sent '
+  'ref: "$http_referer" agent: "$http_user_agent"'
+
+nginx_data:
+  default:
+    - index index.php index.html
+    - location ~ /\.ht:
+      - deny all
+    - location ~ ^/.well-known:
+      - access_log /var/log/nginx/letsencrypt.access.log main
+      - root /usr/share/nginx/html/
+      - auth_basic off
+      - break
+    - location ~ ^/(robots.txt|favicon.ico):
+      - allow all
+      - log_not_found off
+      - access_log off
+  php:
+    - location ~ \.php$:
+      - try_files $uri =404
+      - fastcgi_pass php7_pool
+      - fastcgi_index index.php
+      - fastcgi_param PHP_ADMIN_VALUE "mbstring.func_overload=$php_func_overload"
+      - fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name
+      - fastcgi_ignore_client_abort off
+      - include /etc/nginx/fastcgi_params
+
+nginx_config:
+  upstream:
+    - upstream php7_pool:
+      - server unix:{{ php_fpm_listen }} weight=100 max_fails=10 fail_timeout=5
+
+nginx_vhosts:
+  - server_name: "{{ ansible_hostname }}"
+    root: "/var/www/html/"
+    access_log: "/var/log/nginx/http.access.log main"
+    error_log: "/var/log/nginx/http.error.log"
+    extra_parameters: |
+      include /etc/nginx/conf.d/data/default.conf;
+      location / {
+        add_header content-type text/plain;
+        return 200 "What happened?";
+      }

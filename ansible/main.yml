@@ -1,0 +1,41 @@
+---
+- hosts: app
+  become: yes
+  pre_tasks:
+    - block:
+        # - debug: msg="{{ hostvars['app01.paxful.lo']['ansible_default_ipv4']['address'] }}"
+        # - debug: msg="{{ hostvars['pgsql01.paxful.lo']['ansible_default_ipv4']['address'] }}"
+        # - debug: msg="{{ hostvars['pgsql02.paxful.lo']['ansible_default_ipv4']['address'] }}"
+        - name: 'Create directory'
+          file:
+            path: '/etc/nginx/conf.d/{{ item }}'
+            state: directory
+          with_items:
+            - config
+            - data
+
+        - name: 'Generate conf.d'
+          template:
+            src: 'nginx_confd.j2'
+            dest: '/etc/nginx/conf.d/config/{{ item.key }}.conf'
+            force: yes
+            owner: root
+            group: root
+            mode: 0644
+          with_dict: '{{ nginx_config }}'
+
+        - name: 'Generate conf.d'
+          template:
+            src: 'nginx_confd.j2'
+            dest: '/etc/nginx/conf.d/data/{{ item.key }}.conf'
+            force: yes
+            owner: root
+            group: root
+            mode: 0644
+          with_dict: '{{ nginx_data }}'
+      tags:
+        - nginx
+        - web
+  roles:
+    - { role: geerlingguy.php, tags: [php, app] }
+    - { role: geerlingguy.nginx, tags: [nginx, app] }

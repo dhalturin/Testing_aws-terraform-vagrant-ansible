@@ -1,0 +1,6 @@
+---
+- src: geerlingguy.nginx
+  version: master
+
+- src: geerlingguy.php
+  version: master

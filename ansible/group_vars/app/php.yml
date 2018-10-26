@@ -1,0 +1,18 @@
+---
+php_webserver_daemon: nginx
+php_enable_php_fpm: true
+php_fpm_daemon: php7.0-fpm.service
+php_fpm_listen: /run/php/php7.0-fpm.sock
+# php_fpm_pool_user: www-data
+# php_fpm_pool_group: www-data
+# php_fpm_pool_conf_path: /etc/opt/remi/php72/php-fpm.d/www.conf
+# php_conf_paths: /etc/opt/remi/php72
+# php_extension_conf_paths: /etc/opt/remi/php72/php.d/
+php_short_open_tag: "On"
+php_display_errors: "On"
+php_date_timezone: "Europe/Moscow"
+php_packages:
+  - php7.0
+  - php7.0-fpm
+  - php7.0-common
+  - php7.0-pgsql
