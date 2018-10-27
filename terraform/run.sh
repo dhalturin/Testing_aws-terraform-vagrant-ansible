@@ -23,9 +23,9 @@ clear
 #### terraform check installation
 command -v terraform > /dev/null
 if [ "${?}" -gt 0 ]; then
-    read -p "Terraform is absent. Download? [yes] " answer
+    read -p "Terraform is absent. Download? [y/n] " answer
 
-    if [ "${answer}" != "yes" ]; then
+    if [[ ! "${answer}" =~ ^[Yy] ]]; then
         echo "Bye :("
         exit
     fi
@@ -38,3 +38,12 @@ if [ "${?}" -gt 0 ]; then
     (cd ${temp} && unzip -d /usr/local/sbin terraform_${TERRAFORM_VERSION}* > /dev/null 2>&1)
     status || exit
 fi
+
+if [ ! -f private_key ]; then
+    echo -n "Generate private key... "
+    ssh-keygen -q -t rsa -f private_key -N '' > /dev/null 2>&1
+    status || exit
+fi
+
+terraform init
+terraform apply -auto-approve
