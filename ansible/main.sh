@@ -23,3 +23,4 @@ if [ "${1}" == "vagrant" ]; then
 fi
 
 ansible-playbook -i ${INVENTORY} main.yml -vv -D
+status || exit

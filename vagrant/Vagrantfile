@@ -1,0 +1,28 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/stretch64"
+
+  config.vm.define "app01" do |config|
+    config.vm.box = "debian/stretch64"
+
+    config.vm.network :private_network, ip: "10.0.0.10"
+
+    config.vm.network "forwarded_port", guest: 22, host: 2210
+    config.vm.network "forwarded_port", guest: 80, host: 8010
+  end
+
+  config.vm.define "pgsql01" do |config|
+    config.vm.box = "debian/stretch64"
+
+    config.vm.network :private_network, ip: "10.0.0.11"
+
+    config.vm.network "forwarded_port", guest: 22, host: 2211
+  end
+
+  config.vm.define "pgsql02" do |config|
+    config.vm.box = "debian/stretch64"
+
+    config.vm.network :private_network, ip: "10.0.0.12"
+
+    config.vm.network "forwarded_port", guest: 22, host: 2212
+  end
+end

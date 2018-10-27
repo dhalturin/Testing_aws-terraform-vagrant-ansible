@@ -1,0 +1,8 @@
+---
+db:
+  user: "testuser"
+  pass: "3JnAgNH5rNOaiQ"
+  name: "testbase"
+
+postgresql_master: false
+application_host: false

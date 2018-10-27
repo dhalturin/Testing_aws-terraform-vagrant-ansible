@@ -1,5 +1,6 @@
 vagrant/*
 !vagrant/main.sh
+!vagrant/Vagrantfile
 .temp.*
 ansible/roles/*
 ansible/*.retry

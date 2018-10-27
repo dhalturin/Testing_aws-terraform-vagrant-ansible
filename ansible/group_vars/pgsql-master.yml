@@ -1,0 +1,13 @@
+---
+postgresql_databases:
+  - { name: "{{ db.name }}", owner: "{{ db.user }}", encoding: "UTF-8" }
+
+postgresql_users:
+  - { name: "{{ db.user }}", pass: "{{ db.pass }}", encrypted: yes }
+  - { name: "replication", pass: "{{ postgresql_replication_pass }}", encrypted: yes }
+
+postgresql_user_privileges:
+  - { name: "{{ db.user }}", db: "{{ db.name }}", priv: "ALL" }
+  - { name: "replication", role_attr_flags: "REPLICATION" }
+
+postgresql_master: true

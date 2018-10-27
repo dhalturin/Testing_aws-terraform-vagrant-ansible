@@ -4,3 +4,6 @@
 
 - src: geerlingguy.php
   version: master
+
+- src: ANXS.postgresql
+  version: master

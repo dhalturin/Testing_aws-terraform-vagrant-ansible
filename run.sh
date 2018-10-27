@@ -21,7 +21,7 @@ TYPE=${1}
 
 if [ "${TYPE}" == "vagrant" ]; then
     echo "Using vagrant"
-    (cd vagrant; bash ./main.sh)
+    (cd vagrant; vagrant up)
 else
     cat - <<EOF
 Choose type to run

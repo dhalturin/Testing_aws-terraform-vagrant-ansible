@@ -1,0 +1,19 @@
+---
+postgresql_version: 9.6
+postgresql_wal_level: replica
+postgresql_max_wal_senders: 3
+postgresql_wal_keep_segments: 128
+postgresql_max_replication_slots: 10
+postgresql_replication_pass: m4qpt2MlpIw89G/eUbmR
+
+postgresql_pg_hba_default:
+  - { type: local, database: all, user: '{{ postgresql_admin_user }}', address: '', method: 'peer', comment: 'Allow superuser to connect with Unix domain socket' }
+  - { type: local, database: all, user: all, address: '', method: '{{ postgresql_default_auth_method }}', comment: '"local" is for Unix domain socket connections only' }
+  - { type: host, database: all, user: all, address: '127.0.0.1/32', method: '{{ postgresql_default_auth_method }}', comment: 'IPv4 local connections:' }
+
+postgresql_pg_hba_custom:
+  - { type: host, database: "{{ db.name }}", user: "{{ db.user }}", address: '0.0.0.0/0', method: "{{ postgresql_default_auth_method }}", comment: 'application' }
+  - { type: host, database: "replication", user: "replication", address: '0.0.0.0/0', method: "{{ postgresql_default_auth_method }}", comment: 'replication' }
+
+postgresql_listen_addresses:
+  - "0.0.0.0"

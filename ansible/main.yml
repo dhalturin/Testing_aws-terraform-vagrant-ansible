@@ -1,4 +1,10 @@
 ---
+- hosts: all
+  become: yes
+  tasks:
+    - hostname:
+        name: "{{ inventory_hostname }}"
+
 - hosts: app
   become: yes
   pre_tasks:
@@ -35,7 +41,82 @@
           with_dict: '{{ nginx_data }}'
       tags:
         - nginx
-        - web
+        - app
+  post_tasks:
+    - copy:
+        src: index.php
+        dest: /var/www/html/index.php
+      tags:
+        - nginx
+        - app
   roles:
-    - { role: geerlingguy.php, tags: [php, app] }
-    - { role: geerlingguy.nginx, tags: [nginx, app] }
+    - { role: geerlingguy.php, tags: [ php, app ] }
+    - { role: geerlingguy.nginx, tags: [ nginx, app ] }
+
+- hosts: pgsql
+  become: yes
+  roles:
+    - { role: ANXS.postgresql, tags: [ db ] }
+
+- hosts: all
+  become: yes
+  tasks:
+    - set_fact:
+        master_host: "{{ item }}"
+      with_items: "{{ hostvars['pgsql01.paxful.lo']['ansible_all_ipv4_addresses'] }}"
+      when:
+        - "{{ item | match('^10.0.0.') }}"
+        - postgresql_master == false
+
+    - block:
+        - template:
+            src: config.php.j2
+            dest: "/opt/config.php"
+      when: application_host
+
+    - block:
+        - name: Stop db slave
+          systemd:
+            name: postgresql
+            state: stopped
+
+        - name: Remove db data directory
+          file:
+            state: absent
+            path: "/var/lib/postgresql/9.6/main"
+
+        - name: Waiting db master
+          wait_for:
+            host: "{{ master_host }}"
+            port: 5432
+            delay: 10
+            state: present
+
+        - name: Restore slave
+          shell: "su postgres -c 'PGPASSWORD={{ postgresql_replication_pass }} pg_basebackup -h {{ master_host }} -D /var/lib/postgresql/9.6/main -R -P -U replication --xlog-method=stream'"
+        
+        - name: Create recovery file
+          lineinfile:
+            path: "/var/lib/postgresql/9.6/main/recovery.conf"
+            line: "trigger_file = '/var/lib/postgresql/9.6/main/trigger_file'"
+            insertbefore: EOF
+
+        - name: Start db slave
+          systemd:
+            name: postgresql
+            state: started
+      when:
+        - application_host == false
+        - postgresql_master == false
+
+    - block:
+        - name: Copy dump file
+          copy:
+            src: dump.sql
+            dest: "/opt/dump.sql"
+
+        - name: Restore dump
+          shell: "su postgres -c 'PGPASSWORD={{ db.pass }} psql -U {{ db.user }} {{ db.name }} < /opt/dump.sql'"
+      when:
+        - application_host == false
+        - postgresql_master

@@ -1,4 +1,6 @@
 ---
+application_host: true
+
 nginx_conf_template: "{{ playbook_dir }}/templates/nginxx.conf.j2"
 nginx_remove_default_vhost: true
 nginx_multi_accept: "on"
@@ -34,7 +36,6 @@ nginx_data:
       - try_files $uri =404
       - fastcgi_pass php7_pool
       - fastcgi_index index.php
-      - fastcgi_param PHP_ADMIN_VALUE "mbstring.func_overload=$php_func_overload"
       - fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name
       - fastcgi_ignore_client_abort off
       - include /etc/nginx/fastcgi_params
@@ -47,11 +48,12 @@ nginx_config:
 nginx_vhosts:
   - server_name: "{{ ansible_hostname }}"
     root: "/var/www/html/"
+    index: "index.php"
     access_log: "/var/log/nginx/http.access.log main"
     error_log: "/var/log/nginx/http.error.log"
     extra_parameters: |
       include /etc/nginx/conf.d/data/default.conf;
+      include /etc/nginx/conf.d/data/php.conf;
       location / {
-        add_header content-type text/plain;
-        return 200 "What happened?";
+        try_files $uri $uri/ /index.php$is_args$args;
       }
