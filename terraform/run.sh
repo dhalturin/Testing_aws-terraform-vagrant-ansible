@@ -45,5 +45,22 @@ if [ ! -f private_key ]; then
     status || exit
 fi
 
+if [ ! -f .aws_access_key ]; then
+    read -p "Enter your access key: " key
+    echo ${key} > .aws_access_key
+    status || exit
+fi
+
+if [ ! -f .aws_secret_key ]; then
+    read -p "Enter your secret key: " key
+    echo ${key} > .aws_secret_key
+    status || exit
+fi
+
+echo "Terraform init..."
 terraform init
+status || exit
+
+echo "Terraform apply..."
 terraform apply -auto-approve
+status || exit
