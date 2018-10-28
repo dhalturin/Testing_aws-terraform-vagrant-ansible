@@ -9,7 +9,7 @@
   become: yes
   tasks:
     - name: Install dbus
-      raw: (apt-get -y update && apt-get install -y dbus)
+      raw: (apt-get -y update && apt-get install -y dbus debian-archive-keyring)
 
     - name: 'Debian repository'
       apt_repository:
