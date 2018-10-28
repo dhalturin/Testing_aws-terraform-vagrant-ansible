@@ -28,7 +28,7 @@ else
 Choose type to run
 
 Use:
-    ${0} [type] - vgrant, terraform
+    ${0} [type] - vagrant, terraform
 EOF
     exit
 fi
