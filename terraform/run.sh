@@ -47,13 +47,13 @@ fi
 
 if [ ! -f .aws_access_key ]; then
     read -p "Enter your access key: " key
-    echo ${key} > .aws_access_key
+    echo -n "${key}" > .aws_access_key
     status || exit
 fi
 
 if [ ! -f .aws_secret_key ]; then
     read -p "Enter your secret key: " key
-    echo ${key} > .aws_secret_key
+    echo -n "${key}" > .aws_secret_key
     status || exit
 fi
 
