@@ -1,9 +1,5 @@
 #!/bin/bash
 
-########
-temp=$(mktemp -d ".temp.XXXXXXXXX") || exit "Temporary directory create failed"
-########
-
 cleanup() {
     echo -e "Cleaning up"
     rm -rf "${temp}"
@@ -21,7 +17,12 @@ TYPE=${1}
 
 if [ "${TYPE}" == "vagrant" ]; then
     echo "Using vagrant"
-    (cd vagrant; vagrant up)
+    (cd vagrant; bash ./main.sh)
+    status || exit
+elif [ "${TYPE}" == "terraform" ]; then
+    echo "Using terraform"
+    (cd terraform; bash ./main.sh)
+    status || exit
 else
     cat - <<EOF
 Choose type to run

@@ -1,8 +1,9 @@
 #!/bin/bash
 
 ########
+PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')
 TERRAFORM_VERSION=0.11.10
-TERRAFORM_URL=https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_darwin_amd64.zip
+TERRAFORM_URL=https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${PLATFORM}_amd64.zip
 
 temp=$(mktemp -d "temp.XXXXXXXXX") || exit "Temporary directory create failed"
 ########
