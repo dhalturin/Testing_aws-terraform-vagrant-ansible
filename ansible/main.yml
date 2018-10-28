@@ -16,9 +16,6 @@
   become: yes
   pre_tasks:
     - block:
-        # - debug: msg="{{ hostvars['app01.paxful.lo']['ansible_default_ipv4']['address'] }}"
-        # - debug: msg="{{ hostvars['pgsql01.paxful.lo']['ansible_default_ipv4']['address'] }}"
-        # - debug: msg="{{ hostvars['pgsql02.paxful.lo']['ansible_default_ipv4']['address'] }}"
         - name: 'Create directory'
           file:
             path: '/etc/nginx/conf.d/{{ item }}'
@@ -69,10 +66,10 @@
   become: yes
   tasks:
     - set_fact:
-        master_host: "{{ item }}"
+        master_host: '{{ item }}'
       with_items: "{{ hostvars['pgsql01.paxful.lo']['ansible_all_ipv4_addresses'] }}"
       when:
-        - "{{ item | match('^10.0.0.') }}"
+        - item | match('^10.0.0.') or item | match('^172.')
         - postgresql_master == false
 
     - block:
@@ -101,7 +98,7 @@
 
         - name: Restore slave
           shell: "su postgres -c 'PGPASSWORD={{ postgresql_replication_pass }} pg_basebackup -h {{ master_host }} -D /var/lib/postgresql/9.6/main -R -P -U replication --xlog-method=stream'"
-        
+
         - name: Create recovery file
           lineinfile:
             path: "/var/lib/postgresql/9.6/main/recovery.conf"
