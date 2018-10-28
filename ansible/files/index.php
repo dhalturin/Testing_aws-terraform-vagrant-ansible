@@ -1,22 +1,31 @@
 <?php
 error_reporting(E_ALL ^ E_NOTICE);
 
-if ($_SERVER['REQUEST_URI'] == '/blacklisted') {
+if (in_array($_SERVER['REQUEST_URI'], [ '/show-ips', '/blacklisted' ])) {
     require_once('/opt/config.php');
 
     $db = new PDO("pgsql:dbname={$db['name']};host={$db['host']}", "{$db['user']}", "{$db['pass']}");
 
-    $query = $db->prepare("insert into data (path, ip, date) values (?, ?, ?)");
+    if ($_SERVER['REQUEST_URI'] == '/show-ips') {
+        $query = $db->prepare("select * from data");
+        $query->execute();
 
-    $query->bindParam(1, $_SERVER['REQUEST_URI']);
-    $query->bindParam(2, $_SERVER['REMOTE_ADDR']);
-    $query->bindParam(3, date("Y-m-d H:i:s"));
+        print_r([ '<pre>', $query->fetchAll(PDO::FETCH_ASSOC) ]);
+    }
 
-    $query->execute();
+    if ($_SERVER['REQUEST_URI'] == '/blacklisted') {
+        $query = $db->prepare("insert into data (path, ip, date) values (?, ?, ?)");
 
-    mail("test@domain.com", "Ip blocked", "Ip address was blocked: {$_SERVER['REQUEST_URI']}");
+        $query->bindParam(1, $_SERVER['REQUEST_URI']);
+        $query->bindParam(2, $_SERVER['REMOTE_ADDR']);
+        $query->bindParam(3, date("Y-m-d H:i:s"));
 
-    http_response_code(444);
+        $query->execute();
+
+        mail("test@domain.com", "Ip blocked", "Ip address was blocked: {$_SERVER['REQUEST_URI']}");
+
+        http_response_code(444);
+    }
     die;
 }
 

@@ -2,7 +2,14 @@
 - hosts: all
   become: yes
   tasks:
-    - hostname:
+    - name: Install dbus
+      raw: (apt-get -y update && apt-get install -y dbus)
+    - name: 'Debian repository'
+      apt_repository:
+        repo: deb http://deb.debian.org/debian stretch main
+        state: present
+    - name: 'Update hostname'
+      hostname:
         name: "{{ inventory_hostname }}"
 
 - hosts: app

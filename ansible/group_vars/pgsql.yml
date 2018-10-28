@@ -5,6 +5,7 @@ postgresql_max_wal_senders: 3
 postgresql_wal_keep_segments: 128
 postgresql_max_replication_slots: 10
 postgresql_replication_pass: m4qpt2MlpIw89G/eUbmR
+postgresql_hot_standby: true
 
 postgresql_pg_hba_default:
   - { type: local, database: all, user: '{{ postgresql_admin_user }}', address: '', method: 'peer', comment: 'Allow superuser to connect with Unix domain socket' }
