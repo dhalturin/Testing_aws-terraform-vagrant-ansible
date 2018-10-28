@@ -34,3 +34,7 @@ EOF
 fi
 
 (cd ansible; bash ./main.sh ${TYPE})
+status || exit
+
+(cd inspec; bash ./main.sh ${TYPE})
+status || exit
