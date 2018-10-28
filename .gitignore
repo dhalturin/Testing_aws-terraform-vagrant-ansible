@@ -7,7 +7,9 @@ ansible/*.retry
 ansible/inventory_aws
 !ansible/roles/requirements.yml
 rootkey.csv
-terraform/.terraform
+terraform/.terraform*
 terraform/private_key*
 terraform/terraform*
 terraform/.aws_*
+inspec/*/inspec.lock
+inspec/attributes.yml
