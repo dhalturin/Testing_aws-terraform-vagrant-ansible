@@ -35,7 +35,7 @@ egrep '([a-z0-9]+).paxful.lo' ../ansible/${INVENTORY} | while read line; do
     echo "Test start for ${host}"
 
     if [ "${1}" == "vagrant" ]; then
-        prinvate_key="./vagrant/"$(echo ${line} | egrep -o 'ansible_ssh_private_key_file=(.*)' | cut -f 2 -d '=' | cut -f 1 -d ' ')
+        prinvate_key=$(echo ${line} | egrep -o 'ansible_ssh_private_key_file=(.*)' | cut -f 2 -d '=' | cut -f 1 -d ' ')
         address=$(echo ${line} | egrep -o 'ansible_host=(.*)' | cut -f 2 -d '=' | cut -f 1 -d ' ')
         port=$(echo ${line} | egrep -o 'ansible_ssh_port=(.*)' | cut -f 2 -d '=' | cut -f 1 -d ' ')
         address="127.0.0.1:${port}"
