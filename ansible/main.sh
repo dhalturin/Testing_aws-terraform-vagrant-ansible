@@ -9,10 +9,7 @@ status() {
     test ${?} -eq 0 && echo "Success" || (echo "Failure" && exit 1)
 }
 
-FILE=$(realpath ${0})
-DIR=$(dirname ${FILE})
-
-echo "Run: ${FILE}"
+echo "Run: ansible"
 
 echo -n "Installing requirements: "
 ansible-galaxy install -r roles/requirements.yml > /dev/null
